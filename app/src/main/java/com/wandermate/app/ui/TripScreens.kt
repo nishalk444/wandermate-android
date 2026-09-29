@@ -30,6 +30,7 @@ import java.time.LocalDate
 import kotlin.math.roundToInt
 
 @Composable fun PlanScreen(initial: String, vm: TravelViewModel, created: (String) -> Unit) {
+    val saving by vm.saving.collectAsStateWithLifecycle()
     var destinationId by rememberSaveable { mutableStateOf(initial) }
     var name by rememberSaveable { mutableStateOf("") }
     var date by rememberSaveable { mutableStateOf(LocalDate.now().plusDays(7).toString()) }
@@ -71,7 +72,7 @@ import kotlin.math.roundToInt
                 val trip = Trip(name = name.trim().ifBlank { "${Catalog.destination(destinationId).name} getaway" }, destinationId = destinationId, startDate = date, days = count, budgetCents = amount, travelers = people, family = family, stops = stops)
                 vm.save(trip, created)
             }
-        }, Modifier.fillMaxWidth(), enabled = true) { Text("Create my trip") }
+        }, Modifier.fillMaxWidth(), enabled = !saving) { Text(if (saving) "Saving…" else "Create my trip") }
     }
 }
 

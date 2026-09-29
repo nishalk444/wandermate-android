@@ -17,6 +17,7 @@ class TravelViewModel @Inject constructor(private val repository: TravelReposito
     val trips = repository.trips.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
     val favorites = repository.favorites.stateIn(viewModelScope, SharingStarted.Eagerly, emptySet())
     val theme = MutableStateFlow(repository.theme())
+    val saving = MutableStateFlow(false)
     val weather = MutableStateFlow<Map<String, WeatherState>>(emptyMap())
     private val events = Channel<String>(Channel.BUFFERED)
     val messages = events.receiveAsFlow()
@@ -25,7 +26,11 @@ class TravelViewModel @Inject constructor(private val repository: TravelReposito
         try { block() } catch (e: CancellationException) { throw e } catch (e: Exception) { events.send(e.message ?: "Something went wrong. Please try again.") }
     } }
     fun message(value: String) { work { events.send(value) } }
-    fun save(trip: Trip, then: (String) -> Unit = {}) { work { repository.save(trip); then(trip.id) } }
+    fun save(trip: Trip, then: (String) -> Unit = {}) {
+        if (saving.value) return
+        saving.value = true
+        work { try { repository.save(trip); then(trip.id) } finally { saving.value = false } }
+    }
     fun edit(id: String, transform: (Trip) -> Trip) { work { mutex.withLock {
         val latest = repository.trips.first().firstOrNull { it.id == id } ?: return@withLock
         repository.save(transform(latest))
