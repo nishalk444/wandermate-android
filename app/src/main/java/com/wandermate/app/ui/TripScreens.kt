@@ -16,6 +16,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.text.font.FontWeight
@@ -253,7 +254,7 @@ private fun java.io.InputStream.readBytesLimited(limit: Int): ByteArray {
     var error by rememberSaveable { mutableStateOf<String?>(null) }
     val spent = trip.expenses.sumOf { it.cents }
     val remaining = trip.budgetCents - spent
-    LazyColumn(contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+    LazyColumn(modifier = Modifier.testTag("budget-list"), contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
         item { SectionTitle(if (remaining >= 0) "${money(remaining)} remaining" else "${money(-remaining)} over budget", "Spent ${money(spent)} of ${money(trip.budgetCents)}") }
         item { LinearProgressIndicator(progress = { if (trip.budgetCents == 0L) if (spent > 0) 1f else 0f else (spent.toFloat() / trip.budgetCents).coerceIn(0f, 1f) }, modifier = Modifier.fillMaxWidth()) }
         item { Note("Attraction planning estimate: ${money(trip.stops.sumOf { (Catalog.place(it.placeId)?.estimatedCost ?: 0) * 100L } * trip.travelers)} for your group. Not added to actual spending. Fees, discounts, and per-vehicle rates vary.") }

@@ -35,6 +35,7 @@ jobs:
           path: |
             app/build/reports/
             app/build/test-results/
+            app/schemas/
       - uses: actions/upload-artifact@v4
         with:
           name: wandermate-debug
@@ -59,9 +60,12 @@ jobs:
           api-level: 35
           arch: x86_64
           disable-animations: true
-          script: ./gradlew connectedDebugAndroidTest
+          script: bash scripts/emulator-checks.sh
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: device-test-reports
-          path: app/build/reports/androidTests/
+          path: |
+            app/build/reports/androidTests/
+            app/build/outputs/androidTest-results/
+            app/build/device-evidence/

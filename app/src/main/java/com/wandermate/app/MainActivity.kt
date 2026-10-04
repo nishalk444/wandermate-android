@@ -8,6 +8,7 @@ import androidx.activity.viewModels
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.*
+import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -38,7 +39,7 @@ class MainActivity : ComponentActivity() {
     LaunchedEffect(vm) { vm.messages.collect { snackbar.showSnackbar(it) } }
     Scaffold(
         topBar = { TopAppBar(title = { Text(if (route in roots) "WanderMate" else "Your next discovery") },
-            navigationIcon = { if (route !in roots) IconButton(onClick = { nav.popBackStack() }) { Icon(Icons.Outlined.ArrowBack, "Back") } }) },
+            navigationIcon = { if (route !in roots) IconButton(onClick = { nav.popBackStack() }) { Icon(Icons.AutoMirrored.Outlined.ArrowBack, "Back") } }) },
         snackbarHost = { SnackbarHost(snackbar) },
         bottomBar = { if (route in roots) NavigationBar {
             val icons = listOf(Icons.Outlined.Explore, Icons.Outlined.Luggage, Icons.Outlined.BookmarkBorder, Icons.Outlined.Settings)
