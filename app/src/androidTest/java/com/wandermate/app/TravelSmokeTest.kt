@@ -6,6 +6,7 @@ import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import java.io.File
+import java.io.FileInputStream
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -27,6 +28,12 @@ class TravelSmokeTest {
         val bitmap = checkNotNull(instrumentation.uiAutomation.takeScreenshot())
         File(directory, "$name.png").outputStream().use { bitmap.compress(Bitmap.CompressFormat.PNG, 100, it) }
         bitmap.recycle()
+        // AGP uninstalls the test app at the end of connected tests, deleting app-scoped files.
+        // Preserve synthetic screenshots in the emulator's public Downloads folder first.
+        val evidenceDirectory = "/sdcard/Download/wandermate-evidence"
+        instrumentation.uiAutomation.executeShellCommand(
+            "mkdir -p $evidenceDirectory && cp ${File(directory, "$name.png").absolutePath} $evidenceDirectory/$name.png",
+        ).use { descriptor -> FileInputStream(descriptor.fileDescriptor).use { it.readBytes() } }
     }
 
     @Test fun guestCanNavigateToTripPlanning() {
